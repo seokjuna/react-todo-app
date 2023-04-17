@@ -42,7 +42,8 @@ interface IForm {
     lastName: string;
     username: string;
     password: string;
-    password1: string;
+    passwordCheck: string;
+    extraError?: string;
 }
 
 function ToDoList() {
@@ -50,13 +51,21 @@ function ToDoList() {
         register, 
         handleSubmit, 
         formState: { errors }, 
+        setError
     } = useForm<IForm>({
         defaultValues: {
             email: "@naver.com",
         },
     });
-    const onValid = (data: any) => {
-        console.log(data);
+    const onValid = (data: IForm) => {
+        if (data.password !== data.passwordCheck) {
+            setError(
+                "passwordCheck", 
+                { message: "Password are not the same" },
+                { shouldFocus: true },
+            );
+        }
+        setError("extraError", { message: "Server offline." });
     };
 
     return (
@@ -77,7 +86,15 @@ function ToDoList() {
                 />    
                 <span>{errors?.email?.message}</span>
                 <input 
-                    {...register("firstName", { required: "write here" })} 
+                    {...register("firstName", { 
+                        required: "write here",
+                        validate: {
+                            noNico: (value) =>
+                                value.includes("nico") ? "no nicos allowed" : true,
+                            noNick: (value) =>
+                                value.includes("nick") ? "no nick allowed" : true,
+                        },
+                    })} 
                     placeholder="First Name" 
                 />
                 <span>{errors?.firstName?.message}</span>
@@ -92,22 +109,23 @@ function ToDoList() {
                 />
                 <span>{errors?.username?.message}</span>
                 <input 
-                    {...register("password", { required: "write here" })} 
+                    {...register("password", { required: "write here" , minLength: 5 })} 
                     placeholder="Password" 
                 />
                 <span>{errors?.password?.message}</span>
                 <input 
-                    {...register("password1", { 
+                    {...register("passwordCheck", { 
                         required: "Password is required",
                         minLength: {
                             value: 5,
                             message: "Your password is too short.",
                         },
-                     })} 
-                    placeholder="Password1" 
+                    })} 
+                    placeholder="PasswordCheck" 
                 />
-                <span>{errors?.password1?.message}</span>
+                <span>{errors?.passwordCheck?.message}</span>
                 <button>Add</button>
+                <span>{errors?.extraError?.message}</span>
             </form>
         </div>
     );
