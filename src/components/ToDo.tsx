@@ -18,10 +18,19 @@ function ToDo({ text, category, id }: IToDo) {
             ];
         });
     };
+    const deleteToDo = () => {
+        setToDos((oldToDos) => {
+            const targetIndex = oldToDos.findIndex(toDo => toDo.id === id);
+            return [
+                ...oldToDos.slice(0, targetIndex),
+                ...oldToDos.slice(targetIndex + 1),
+            ];
+        });
+    };
 
     return (
         <li>
-            <span>{text}</span>
+            <span onClick={deleteToDo}>{text}</span>
             {category !== Categories.DOING && (
                  <button name={Categories.DOING} onClick={onClick}>Doing</button>
             )}
